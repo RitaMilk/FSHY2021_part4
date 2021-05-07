@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+"title": "second record",
+"author": "viktor hugo",
+"url": "www.fmi.fi",
+"likes": 1
+}
