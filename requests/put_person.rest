@@ -1,6 +1,7 @@
-PUT http://localhost:3001/api/persons/60885d917edca31b30d14b4d
+PUT http://localhost:3003/api/blogs/6097ffb5e221392e30178b95
 Content-Type: application/json
 
 {
-"number": "00-11-22-33"
+"url": "https://www.petshopboys.co.uk/news",
+"likes": 2
 }
