@@ -3,5 +3,5 @@ Content-Type: application/json
 
 {
 "url": "https://www.petshopboys.co.uk/news",
-"likes": 2
+"likes": 3
 }

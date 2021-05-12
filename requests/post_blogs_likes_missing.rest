@@ -4,6 +4,5 @@ Content-Type: application/json
 {
 "title": "4 record",
 "author": "me too",
-"url": "www.fmi.fi",
-"likes": 1
+"url": "www.fmi.fi"
 }
