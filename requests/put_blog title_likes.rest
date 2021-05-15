@@ -2,6 +2,6 @@ PUT http://localhost:3003/api/blogs/6097ffb5e221392e30178b95
 Content-Type: application/json
 
 {
-"url": "https://www.petshopboys.co.uk/news",
-"likes": 30
+"title": "My name is changed",
+"likes": 15
 }

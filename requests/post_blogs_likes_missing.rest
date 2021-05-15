@@ -2,7 +2,7 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-"title": "4 record",
-"author": "me too",
+"title": "missibnh like record",
+"author": "me five",
 "url": "www.fmi.fi"
 }
