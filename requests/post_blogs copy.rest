@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
 "title": "4 record",
-"author": "me too_2",
+"author": "me too_1",
 "url": "www.fmi.fi",
 "likes": 1
 }

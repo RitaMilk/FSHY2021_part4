@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-"title": "4 record",
-"author": "me too_2",
+"title": "weather in Finland",
+"author": "MTV ankkuri",
 "url": "www.fmi.fi",
-"likes": 1
+"likes": 10
 }

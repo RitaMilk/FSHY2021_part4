@@ -1,11 +1,14 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const listHelper = require('../utils/list_helper')
 
 blogsRouter.get('/', async (request, response) => {
   /* Blog.find({}).then(blogs => {
     response.json(blogs)
   }) */
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).
+    populate('user', { username: 1, name: 1 })
   response.json(blogs.map(blog => blog.toJSON()))
 })
 
@@ -21,7 +24,7 @@ blogsRouter.get('/', async (request, response) => {
     .catch(error => next(error))
 }) */
 blogsRouter.get('/:id', async (request, response) => {
-  const blog = await   Blog.findById(request.params.id)
+  const blog = await Blog.findById(request.params.id)
   if (blog) {
     response.json(blog.toJSON())
   } else {
@@ -31,15 +34,27 @@ blogsRouter.get('/:id', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
   const body = request.body
 
+  const usersInDB = await User.find()
+  const user = usersInDB[0]
+  //--console.log('users =', user)
   const blog = new Blog({
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes
+    likes: body.likes,
+    user: user._id
   })
+  /*const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes
+  })*/
 
   const savedBlog = await blog.save()
-  response.json(savedBlog.toJSON)
+  user.blogs = user.blogs.concat(savedBlog._id)
+  await user.save()
+  response.json(savedBlog.toJSON())
 })
 blogsRouter.delete('/:id', async (request, response) => {
   await Blog.findByIdAndRemove(request.params.id)
@@ -56,17 +71,17 @@ blogsRouter.delete('/:id', async (request, response) => {
 
 blogsRouter.put('/:id', async (request, response) => {
   const body = request.body
-  const blog={}
-  if (body.title){
+  const blog = {}
+  if (body.title) {
     blog.title = body.title
   }
-  if (body.author){
+  if (body.author) {
     blog.author = body.author
   }
-  if (body.url){
+  if (body.url) {
     blog.url = body.url
   }
-  if (body.likes){
+  if (body.likes) {
     blog.likes = body.likes
   }
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })

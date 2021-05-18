@@ -8,7 +8,11 @@ const app = require('../app')
 const api = supertest(app)
 //part 4 supertest
 const Blog = require('../models/blog')
-const { response } = require('express')
+//part 4.15
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
+//4.15
+//const { response } = require('express')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -55,7 +59,7 @@ test('the first blog has id property', async () => {
   expect(response.body[0].id).toBeDefined()
 })
 //part 4.10
-test('a valid blog can be added', async () => {
+test('a validblog can be added', async () => {
   const newBlog = {
     title: 'async/await simplifies making async calls',
     author: 'JSGuru',
@@ -105,14 +109,14 @@ test('blogs likes is set to 0 by default', async () => {
   const response = await api.get('/api/blogs')
 
   //const titles = response.body.map(r => r.title)
-  var isByCriteria = function(record){
+  var isByCriteria = function (record) {
     return record.title === 'if property is missing'
   }
   const titlesAndLikes = response.body.filter(isByCriteria)[0]
   //const titlesAndLikes = response.body.map(r => {return { title:r.title,likes:r.likes }}).filter( r => r.titles==='if property is missing')
 
   expect(response.body).toHaveLength(listHelper.initialBlogs.length + 1)
-  logger.info('titlesAndLikes',titlesAndLikes)
+  logger.info('titlesAndLikes', titlesAndLikes)
   expect(titlesAndLikes.title).toContain(
     'if property is missing'
   )
@@ -130,7 +134,7 @@ test('catch status 400 if title is missing', async () => {
   }
 
   // eslint-disable-next-line indent
-    await api
+  await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(400)
@@ -151,7 +155,7 @@ test('catch status 400 if url is missing', async () => {
   }
 
   // eslint-disable-next-line indent
-    await api
+  await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(400)
@@ -166,7 +170,7 @@ test('catch status 400 if url is missing', async () => {
 //4.12
 //part 4.13
 describe('deletion of a blog', () => {
-  test('succeeds with status code 204 if id is valid', async () => {
+  test('blogdel succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await listHelper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
     console.log(blogToDelete.id)
@@ -190,11 +194,11 @@ describe('update a blog', () => {
   test('blog can be updated', async () => {
     const blogsAtStart = await listHelper.blogsInDb()
     const blogToUpdate = blogsAtStart[0]
-    console.log('blog to update',blogToUpdate.id)
+    console.log('blog to update', blogToUpdate.id)
     const upBlog = {}
-    upBlog.title=blogToUpdate.title + '_1'
-    upBlog.author=blogToUpdate.author + '_1'
-    upBlog.likes=blogToUpdate.likes + 7
+    upBlog.title = blogToUpdate.title + '_1'
+    upBlog.author = blogToUpdate.author + '_1'
+    upBlog.likes = blogToUpdate.likes + 7
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
@@ -207,11 +211,196 @@ describe('update a blog', () => {
     expect(blogsAtEnd).toHaveLength(listHelper.initialBlogs.length)
     const response = await api
       .get(`/api/blogs/${blogToUpdate.id}`)
-    const updatedBlog =response.body
+    const updatedBlog = response.body
     expect(updatedBlog.title).toContain(upBlog.title)
   })
 })
 //4.14
+//part 4.15
+describe('when there is initially one user at db', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await listHelper.usersInDb()
+
+    const newUser = {
+      username: 'mluukkai',
+      name: 'Matti Luukkainen',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await listHelper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    expect(usernames).toContain(newUser.username)
+  })
+  //})
+  test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await listHelper.usersInDb()
+
+    const newUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('`username` to be unique')
+
+    const usersAtEnd = await listHelper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+  //part 4.16
+  test('username less than 3 marks return status code 400', async () => {
+    const usersAtStart = await listHelper.usersInDb()
+
+    const newUser = {
+      username: 'ml',
+      name: 'Matti Latti',
+      password: 'sal',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+    //.expect(response.body,/`password have to be 3 or more marks`)
+    //.expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await listHelper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+  test('password less than 3 marks return status code 400', async () => {
+    const usersAtStart = await listHelper.usersInDb()
+
+    const newUser = {
+      username: 'abc',
+      name: 'Matti Latti',
+      password: '12',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+    //.expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('password have to be 3 or more marks')
+    const usersAtEnd = await listHelper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+  test('missing of password returns status code 400', async () => {
+    const usersAtStart = await listHelper.usersInDb()
+
+    const newUser = {
+      username: 'abc',
+      name: 'Matti Latti'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+    //.expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('password missing')
+    const usersAtEnd = await listHelper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+  test('missing of username returns status code 400', async () => {
+    const usersAtStart = await listHelper.usersInDb()
+
+    const newUser = {
+      name: 'Matti Latti',
+      password: 'verygood'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+    //.expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('User validation failed: username: Path `username` is required.')
+    const usersAtEnd = await listHelper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+  //4.16
+})
+describe('when there is initially two user at db', () => {
+  beforeEach(async () => {
+
+    //const cry = (s) => { return bcrypt.hash(s, 10) }
+    const twoUsers = listHelper.twoUsers
+    //const twoUsers1 = twoUsers.map(function (u) {
+    //  return { username: u.username, name: u.name, cry(u.password)
+    // }
+    //})
+    //const passwordHash = await bcrypt.hash('sekret', 10)
+    //const user = new User({ username: 'root', passwordHash })
+
+    //const passwordHash = await bcrypt.hash('sekret', 10)
+    //const user = new User({ username: 'root', passwordHash })
+    await User.deleteMany({})
+    await User.insertMany(twoUsers)
+
+    //await User.insertMany(twoUsers)
+    await Blog.deleteMany({})
+    await Blog.insertMany(listHelper.initialBlogs)
+  })
+  test('a validblog2 can be added', async () => {
+    const newBlog = {
+      title: 'async/await simplifies making async calls',
+      author: 'JSGuru',
+      url: 'https://fullstackopen.com/en/part4/testing_the_backend#more-tests-and-refactoring-the-backend',
+      likes: 1
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    //
+    const blogsAtEnd = await listHelper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(listHelper.initialBlogs.length + 1)
+
+    // const contents = notesAtEnd.map(n => n.content)
+    const titles = blogsAtEnd.map(r => r.title)
+    //
+    // response = await api.get('/api/blogs')
+
+    //const titles = response.body.map(r => r.title)
+
+    //expect(response.body).toHaveLength(initialBlogs.length + 1)
+
+    expect(titles).toContain(
+      'async/await simplifies making async calls'
+    )
+  })
+  //4.16
+})
+//4.15
 afterAll(() => {
   mongoose.connection.close()
 })
