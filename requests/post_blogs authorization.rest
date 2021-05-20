@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9sZCIsImlkIjoiNjBhNmI0MzA2MWJlZDkxMzMwZDE5MzRlIiwiaWF0IjoxNjIxNTM4MzE5fQ.ZEX_KSgSJx-K46UGdK9_aI-IJz4iwNwqNNJdAYiTIoA
+
+{
+"title": "Be helth",
+"author": "Jaska Jääskeläien",
+"url": "www.terveystalo.fi",
+"likes": 1
+}
