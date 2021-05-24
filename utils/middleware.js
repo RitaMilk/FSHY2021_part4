@@ -7,6 +7,20 @@ const requestLogger = (request, response, next) => {
   logger.info('---')
   next()
 }
+//part 4.19: 4.20 as middleware getTokenFrom renamed tokenExtractor
+const tokenExtractor = async(request, response, next) => {
+  const authorization = await request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    request.token=authorization.substring(7)
+    console.log('token=',request.token)
+    //return request.token
+
+  }
+  //return null
+  console.log('token befor next=',request.token)
+  next()
+}
+//part4.20
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
@@ -26,6 +40,7 @@ const errorHandler = (error, request, response, next) => {
 
 module.exports = {
   requestLogger,
+  tokenExtractor,
   unknownEndpoint,
   errorHandler
 }

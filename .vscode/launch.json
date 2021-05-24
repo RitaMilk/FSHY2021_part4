@@ -27,9 +27,10 @@
         "--inspect-brk",
         "${workspaceRoot}/node_modules/jest/bin/jest.js",
         "test",
-        "-t validblog2",
+        "-t validblog3",
         "--verbose",
         "--runInBand",
+        "--detectOpenHandles"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
