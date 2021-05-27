@@ -26,12 +26,15 @@
       "runtimeArgs": [
         "--inspect-brk",
         "${workspaceRoot}/node_modules/jest/bin/jest.js",
-        "test",
-        "-t validblog3",
-        "--verbose",
         "--runInBand",
-        "--detectOpenHandles"
+        "-t part4_21",
+        "--verbose",
+        "--detectOpenHandles",
+        "blog_api_del"
       ],
+      "env": {
+        "NODE_ENV": "test"
+      },
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "port": 9229

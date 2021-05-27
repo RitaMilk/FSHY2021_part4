@@ -346,7 +346,7 @@ describe('when there is initially one user at db', () => {
   })
   //4.16
 })
-describe('when there is initially two user at db', () => {
+describe('when there are initially two(three) user at db', () => {
   beforeEach(async () => {
 
     //const cry = (s) => { return bcrypt.hash(s, 10) }
@@ -399,26 +399,6 @@ describe('when there is initially two user at db', () => {
     )
   })
   //4.16
-})
-//4.15
-//4.20
-describe('send blog with valid authorization', () => {
-  test('an authorrized  validblog3 can be added', async () => {
-    const newBlog = {
-      title: 'Authorized writing',
-      author: 'TokenGuru',
-      url: 'https://blog.novanet.no/rest-client-for-visual-studio-code-auth/',
-      likes: 1
-    }
-    const token ='bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9sZCIsImlkIjoiNjBhNmI0MzA2MWJlZDkxMzMwZDE5MzRlIiwiaWF0IjoxNjIxNTM4MzE5fQ.ZEX_KSgSJx-K46UGdK9_aI-IJz4iwNwqNNJdAYiTIoA'
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .set({ Authorization:  token })
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-  })
-
 })
 afterAll(() => {
   mongoose.connection.close()

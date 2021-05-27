@@ -74,9 +74,57 @@ blogsRouter.post('/', async (request, response) => {
   await user.save()
   response.json(savedBlog.toJSON())
 })
+//****************
+//**   DELETE    *
+//****************
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id)
-  response.status(204).end()
+  console.log('1. in delete controller')
+  const decodedToken = jwt.verify(request.token, config.SECRET)
+  console.log('2. in delete controller, decod is done')
+  if (!request.token || !decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  console.log('3. token was ok')
+  const userid=decodedToken.id
+  const userFromRequest = await User.findById(userid)
+  console.log('4. user is found by decodedToken.id=',userid)
+  console.log('5. look for log with id',request.params.id)
+  //const BlogToDelete = await Blog.find(request.params.id)
+  const BlogToDelete = await Blog.findById(request.params.id)
+  console.log('6.blogtodelete',BlogToDelete)
+  console.log('7.BlogToDelete.user.toString=',BlogToDelete.user.toString())
+  console.log('8.userFromRequest.toString()',userFromRequest.toString())
+  console.log('9.userid fo comparision=',userid)
+  //const user2=BlogToDelete.user
+  if ( BlogToDelete.user.toString() === userid.toString() ) {
+    await Blog.findByIdAndRemove(request.params.id)
+    const userBlogsID=userFromRequest.blogs
+    console.log('users list of blogs at start=',userBlogsID)
+
+    //console.log('blogs length=',leftBlogsID.length)
+    const stringToExclude=request.params.id.toString()
+    console.log('string to remove from list=',stringToExclude)
+    const leftBlogsID=userBlogsID.filter(item => {
+      console.log('item.toString=',item.toString())
+      return (item.toString()!==stringToExclude)
+    })
+    //      const arrEnd=arrStart.filter(item => {return(item!==stringToExclude)})
+    console.log('maped blogs are=',leftBlogsID)
+    console.log('blogs length=',leftBlogsID.length)
+    if (leftBlogsID.length===0){
+      userFromRequest.blogs =[]
+    }
+    else {
+      userFromRequest.blogs = leftBlogsID
+    }
+    await userFromRequest.save()
+
+    response.status(204).end()
+  }
+  else{
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
 })
 
 /* blogsRouter.delete('/:id', (request, response, next) => {

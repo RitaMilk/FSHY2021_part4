@@ -24,6 +24,11 @@ const twoUsers = [
     username: 'jxs',
     name: 'Join Steinbeck',
     passwordHash: '$2b$10$Aguqm.Y7AxI4bqAHrOw3T.MmJf1iZ7uWXe5US28d6WfxB8Vph0xUW'
+  },
+  {
+    username: 'old',
+    name: 'Old lady',
+    passwordHash: '$2b$10$jTfSM2OuA/ptAUsyhlCqRezCSq59P7J70Kz/fN.jjZuCuMq/OyXPC'
   }
 ]
 const dummy = (blogs) => {
@@ -49,6 +54,25 @@ const favoriteBlog = (blogs) => {
   }
   return expectedBlog
 }
+
+const wantedBlog = async(blogs) => {
+  //
+  var isByCriteria = function (record) {
+    return record.title === 'Wanted to be deleted'
+  }
+  const blog = await blogs.filter(isByCriteria)[0]
+  //
+
+  const wantedBlog = {
+    title: blog.title,
+    author: blog.author,
+    likes: blog.likes,
+    id: blog.id
+  }
+  return wantedBlog
+}
+
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
@@ -63,6 +87,7 @@ module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  wantedBlog,
   blogsInDb,
   usersInDb
 }
