@@ -61,8 +61,8 @@ test('the first blog has id property', async () => {
 //part 4.10
 test('part_4_10 a validblog can be added', async () => {
   const newBlog = {
-    title: 'async/await simplifies making async calls in part_4_10',
-    author: 'JSGuru',
+    title: 'I_am_blog of part_4_10',
+    author: 'Old Lady',
     url: 'https://fullstackopen.com/en/part4/testing_the_backend#more-tests-and-refactoring-the-backend',
     likes: 1
   }
@@ -103,17 +103,70 @@ test('part_4_10 a validblog can be added', async () => {
   //expect(response.body).toHaveLength(initialBlogs.length + 1)
 
   expect(titles).toContain(
-    'async/await simplifies making async calls'
+    'I_am_blog of part_4_10'
   )
 })
 //4.10
 //
 //part 4.11
 test('part_4_11 blogs likes is set to 0 by default', async () => {
+  console.log('1.part_4_11 blogs likes is set to 0 by default')
   const newBlog = {
-    title: 'if property is missing',
+    title: 'I am blog of part_4_11 if property is missing',
+    author: 'Old Lady',
+    url: 'www.fmi.fi'
+  }
+  //4.23 add user
+  const user =
+  {
+    username: 'old',
+    password: 'divan'
+  }
+  console.log('2.want to log in part_4_11')
+  const resultUser=await api
+    .post('/api/login')
+    .send(user)
+    .expect(200)
+
+  let token ='bearer '
+  token=await token.concat(resultUser.body.token.toString())
+  console.log('token in part_4_11_post=',token)
+  //4.23
+
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .set({ Authorization : token })
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  //const titles = response.body.map(r => r.title)
+  let isByCriteria = function (record) {
+    return record.title === 'I am blog of part_4_11 if property is missing'
+  }
+  const titlesAndLikes = await response.body.filter(isByCriteria)[0]
+  //const titlesAndLikes = response.body.map(r => {return { title:r.title,likes:r.likes }}).filter( r => r.titles==='if property is missing')
+
+  expect(response.body).toHaveLength(listHelper.initialBlogs.length + 1)
+  console.log('titlesAndLikes', titlesAndLikes)
+  //logger.info('titlesAndLikes', titlesAndLikes)
+  expect(titlesAndLikes.title).toContain(
+    'I am blog of part_4_11 if property is missing'
+  )
+  expect(titlesAndLikes.likes).toBe(0)
+
+})
+//4.11
+//part 4.12
+test('catch status 400 if title is missing', async () => {
+
+  const newBlog = {
     author: 'JSGuru',
-    url: 'https://mongoosejs.com/docs/guide.html#definition'
+    url: 'https://mongoosejs.com/docs/guide.html#definition',
+    likes: 1
   }
   //4.23 add user
   const user ={
@@ -130,46 +183,11 @@ test('part_4_11 blogs likes is set to 0 by default', async () => {
   token=await token.concat(resultUser.body.token.toString())
   console.log('token in post=',token)
   //4.23
-
-
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .set({ Authorization : token })
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-
-  const response = await api.get('/api/blogs')
-
-  //const titles = response.body.map(r => r.title)
-  var isByCriteria = function (record) {
-    return record.title === 'if property is missing'
-  }
-  const titlesAndLikes = response.body.filter(isByCriteria)[0]
-  //const titlesAndLikes = response.body.map(r => {return { title:r.title,likes:r.likes }}).filter( r => r.titles==='if property is missing')
-
-  expect(response.body).toHaveLength(listHelper.initialBlogs.length + 1)
-  logger.info('titlesAndLikes', titlesAndLikes)
-  expect(titlesAndLikes.title).toContain(
-    'if property is missing'
-  )
-  expect(titlesAndLikes.likes).toBe(0)
-
-})
-//4.11
-//part 4.12
-test('catch status 400 if title is missing', async () => {
-
-  const newBlog = {
-    author: 'JSGuru',
-    url: 'https://mongoosejs.com/docs/guide.html#definition',
-    likes: 1
-  }
-
   // eslint-disable-next-line indent
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization:token })
     .expect(400)
     .expect('Content-Type', /application\/json/)
 
@@ -186,11 +204,26 @@ test('catch status 400 if url is missing', async () => {
     author: 'JSGuru',
     likes: 1
   }
+  //4.23 add user
+  const user ={
+    username: 'old',
+    password: 'divan'
+  }
 
+  const resultUser=await api
+    .post('/api/login')
+    .send(user)
+    .expect(200)
+
+  let token ='bearer '
+  token=await token.concat(resultUser.body.token.toString())
+  console.log('token in post=',token)
+  //4.23
   // eslint-disable-next-line indent
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization:token })
     .expect(400)
     .expect('Content-Type', /application\/json/)
   //const response = await api.get('/api/blogs')
