@@ -59,17 +59,33 @@ test('the first blog has id property', async () => {
   expect(response.body[0].id).toBeDefined()
 })
 //part 4.10
-test('a validblog can be added', async () => {
+test('part_4_10 a validblog can be added', async () => {
   const newBlog = {
-    title: 'async/await simplifies making async calls',
+    title: 'async/await simplifies making async calls in part_4_10',
     author: 'JSGuru',
     url: 'https://fullstackopen.com/en/part4/testing_the_backend#more-tests-and-refactoring-the-backend',
     likes: 1
   }
+  //4.23 add user
+  const user ={
+    username: 'old',
+    password: 'divan'
+  }
+
+  const resultUser=await api
+    .post('/api/login')
+    .send(user)
+    .expect(200)
+
+  let token ='bearer '
+  token=await token.concat(resultUser.body.token.toString())
+  console.log('token in post=',token)
+  //4.23
 
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization:  token })
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -93,16 +109,33 @@ test('a validblog can be added', async () => {
 //4.10
 //
 //part 4.11
-test('blogs likes is set to 0 by default', async () => {
+test('part_4_11 blogs likes is set to 0 by default', async () => {
   const newBlog = {
     title: 'if property is missing',
     author: 'JSGuru',
     url: 'https://mongoosejs.com/docs/guide.html#definition'
   }
+  //4.23 add user
+  const user ={
+    username: 'old',
+    password: 'divan'
+  }
+
+  const resultUser=await api
+    .post('/api/login')
+    .send(user)
+    .expect(200)
+
+  let token ='bearer '
+  token=await token.concat(resultUser.body.token.toString())
+  console.log('token in post=',token)
+  //4.23
+
 
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization : token })
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -170,13 +203,28 @@ test('catch status 400 if url is missing', async () => {
 //4.12
 //part 4.13
 describe('deletion of a blog', () => {
-  test('blogdel succeeds with status code 204 if id is valid', async () => {
+  test('blog delete succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await listHelper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
     console.log(blogToDelete.id)
-    //logger.info(`deleting blog with id ${blogToDelete.id}`)
+    //4.23 add user
+    const user ={
+      username: 'old',
+      password: 'divan'
+    }
+
+    const resultUser=await api
+      .post('/api/login')
+      .send(user)
+      .expect(200)
+
+    let token ='bearer '
+    token=await token.concat(resultUser.body.token.toString())
+    console.log('token in post=',token)
+    //4.23
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set({ Authorization:token })
       .expect(204)
 
     const blogsAtEnd = await listHelper.blogsInDb()
@@ -368,16 +416,34 @@ describe('when there are initially two(three) user at db', () => {
     await Blog.insertMany(listHelper.initialBlogs)
   })
   test('a validblog2 can be added', async () => {
+    console.log('entered test a validblog2 can be added')
     const newBlog = {
-      title: 'async/await simplifies making async calls',
+      title: 'async/await simplifies making async calls in validblog2',
       author: 'JSGuru',
       url: 'https://fullstackopen.com/en/part4/testing_the_backend#more-tests-and-refactoring-the-backend',
       likes: 1
     }
+    //4.23 add user
+    const user ={
+      username: 'old',
+      password: 'divan'
+    }
 
+    const resultUser=await api
+      .post('/api/login')
+      .send(user)
+      .expect(200)
+
+    let token ='bearer '
+    token=await token.concat(resultUser.body.token.toString())
+    console.log('token in post=',token)
+    //4.23
+
+    console.log('post blogs')
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set({ Authorization:token })
       .expect(200)
       .expect('Content-Type', /application\/json/)
 

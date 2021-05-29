@@ -1,5 +1,8 @@
+//const config = require('./utils/config') //part4.22
 const logger = require('./logger')
-
+const jwt = require('jsonwebtoken') //part4.22
+const User = require('../models/user') //part 4.22
+const config = require('../utils/config') //part4.22
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
   logger.info('Path:  ', request.path)
@@ -12,12 +15,26 @@ const tokenExtractor = async(request, response, next) => {
   const authorization = await request.get('authorization')
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     request.token=authorization.substring(7)
-    console.log('token=',request.token)
+    console.log('tokenExtractor:token from substring =',request.token)
     //return request.token
 
   }
   //return null
-  console.log('token befor next=',request.token)
+  console.log('tokenExtractor token befor next=',request.token)
+  next()
+}
+//part4.20
+const userExtractor = async(request, response, next) => {
+  //new code
+  const decodedToken = jwt.verify(request.token, config.SECRET)
+  if (!request.token || !decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  console.log('4. blogsPost user decodedToken.id=',decodedToken.id)
+  request.user = await User.findById(decodedToken.id)
+  //new code
+  console.log('5.userExtractor token befor next=',request.token)
+  console.log('6.userExtractor user befor next=',request.user)
   next()
 }
 //part4.20
@@ -41,6 +58,7 @@ const errorHandler = (error, request, response, next) => {
 module.exports = {
   requestLogger,
   tokenExtractor,
+  userExtractor,
   unknownEndpoint,
   errorHandler
 }

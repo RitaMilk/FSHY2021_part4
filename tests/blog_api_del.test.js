@@ -5,7 +5,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 //part 4 supertest
-//const Blog = require('../models/blog')
+const Blog = require('../models/blog')
 //const bcrypt = require('bcrypt')
 //const User = require('../models/user')
 
@@ -21,7 +21,29 @@ const api = supertest(app)
 //     .expect('Content-Type', /application\/json/)
 // })
 //4.20
-describe('send blog with valid authorization', () => {
+describe('send two blogs with valid authorization and delete one of them', () => {
+  test('just prepare test cases',async() => {
+    await Blog.deleteMany({})
+    await Blog.insertMany(listHelper.initialBlogs)
+  })
+  test('add Max Pain', async () => {
+    const newUser = {
+      username: 'pain',
+      name: 'Max Pain',
+      password: 'floor',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await listHelper.usersInDb()
+    const usernames = usersAtEnd.map(u => u.username)
+    console.log('usernames now=',usernames)
+    expect(usernames).toContain(newUser.username)
+  })
   test('part4_20_1 an authorrized  validblog3 can be added', async () => {
     const newBlog = {
       title: 'Wanted to be deleted',
@@ -53,9 +75,9 @@ describe('send blog with valid authorization', () => {
 
     console.log('blahblah')
   })
-  test('part4_20_2 an authorrized  validblog3 can be added', async () => {
+  test('part4_20_2 an authorrized  valid_blog_3 can be added', async () => {
     const newBlog = {
-      title: 'Not Not NOt Wanted to be deleted',
+      title: 'Blog3 Wanted to be deleted',
       author: 'TokenGuru',
       url: 'https://expressjs.com/en/guide/writing-middleware.html',
       likes: 20

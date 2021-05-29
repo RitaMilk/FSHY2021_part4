@@ -2,8 +2,8 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach zz",
-      "port": 9229,
+      "name": "Attach by Process ID",
+      "processId": "${command:PickProcess}",
       "request": "attach",
       "skipFiles": [
         "<node_internals>/**"
@@ -11,13 +11,13 @@
       "type": "pwa-node"
     },
     {
-      "name": "Attach dd",
+      "name": "Rest client",
       "processId": "${command:PickProcess}",
       "request": "attach",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "type": "pwa-node",
+      "type": "pwa-node"
     },
     {
       "name": "Debug Jest Tests",
@@ -27,10 +27,9 @@
         "--inspect-brk",
         "${workspaceRoot}/node_modules/jest/bin/jest.js",
         "--runInBand",
-        "-t part4_21",
+        "-t blog2",
         "--verbose",
-        "--detectOpenHandles",
-        "blog_api_del"
+        "blog_api"
       ],
       "env": {
         "NODE_ENV": "test"
