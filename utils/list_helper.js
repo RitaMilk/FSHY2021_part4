@@ -71,6 +71,22 @@ const wantedBlog = async(blogs) => {
   }
   return wantedBlog
 }
+const wantedUser = async(users) => {
+  //
+  var isByCriteria = function (record) {
+    return record.username === 'old'
+  }
+  const user = await users.filter(isByCriteria)[0]
+  //
+
+  const wantedUser = {
+    username: user.username,
+    name: user.name,
+    id: user.id,
+    blogs: user.blogs
+  }
+  return wantedUser
+}
 
 
 const blogsInDb = async () => {
@@ -88,6 +104,7 @@ module.exports = {
   totalLikes,
   favoriteBlog,
   wantedBlog,
+  wantedUser,
   blogsInDb,
   usersInDb
 }

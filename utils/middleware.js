@@ -15,12 +15,9 @@ const tokenExtractor = async(request, response, next) => {
   const authorization = await request.get('authorization')
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     request.token=authorization.substring(7)
-    console.log('tokenExtractor:token from substring =',request.token)
-    //return request.token
-
+    //console.log('tokenExtractor:token from substring =',request.token)
   }
-  //return null
-  console.log('tokenExtractor token befor next=',request.token)
+  //console.log('tokenExtractor token befor next=',request.token)
   next()
 }
 //part4.20
@@ -30,11 +27,11 @@ const userExtractor = async(request, response, next) => {
   if (!request.token || !decodedToken.id) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
-  console.log('4. blogsPost user decodedToken.id=',decodedToken.id)
+  //console.log('4. blogsPost user decodedToken.id=',decodedToken.id)
   request.user = await User.findById(decodedToken.id)
   //new code
-  console.log('5.userExtractor token befor next=',request.token)
-  console.log('6.userExtractor user befor next=',request.user)
+  //console.log('5.userExtractor token befor next=',request.token)
+  //console.log('6.userExtractor user befor next=',request.user)
   next()
 }
 //part4.20

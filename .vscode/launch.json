@@ -27,7 +27,7 @@
         "--inspect-brk",
         "${workspaceRoot}/node_modules/jest/bin/jest.js",
         "--runInBand",
-        "-t blog2",
+        "-t part_4_13",
         "--verbose",
         "blog_api"
       ],

@@ -46,10 +46,10 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 blogsRouter.post('/', middleware.userExtractor,async (request, response) => {
-  console.log('1.entered blogsPost')
+  //console.log('1.entered blogsPost')
   const body = request.body
-  console.log('2.request.body.likes=',request.body.likes)
-  console.log('3.request.token=',request.token)
+  //console.log('2.request.body.likes=',request.body.likes)
+  //console.log('3.request.token=',request.token)
   //part 4.20
   //part4.20 is moved into middleware due to part4.22
   /* const decodedToken = jwt.verify(request.token, config.SECRET)
@@ -74,7 +74,7 @@ blogsRouter.post('/', middleware.userExtractor,async (request, response) => {
     url: body.url,
     likes: body.likes
   })*/
-  console.log('5.saving user\'s list of blogs')
+  //console.log('5.saving user\'s list of blogs')
   const savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
@@ -84,8 +84,8 @@ blogsRouter.post('/', middleware.userExtractor,async (request, response) => {
 //**   DELETE    *
 //****************
 blogsRouter.delete('/:id',middleware.userExtractor, async (request, response) => {
-  console.log('1. in delete controller')
-  console.log('2. inserted request.token=',request.tokrn)
+  //console.log('1. in delete controller')
+  //console.log('2. inserted request.token=',request.tokrn)
 
   /* part4.22 refactoring const decodedToken = jwt.verify(request.token, config.SECRET)
   console.log('2. in delete controller, decod is done')
@@ -97,31 +97,29 @@ blogsRouter.delete('/:id',middleware.userExtractor, async (request, response) =>
   const userFromRequest = await User.findById(userid)
   console.log('4. user is found by decodedToken.id=',userid) */
   const userFromRequest =request.user
-  console.log('3.inserted user=',userFromRequest)
-  console.log('5. look for log with id',request.params.id)
+  //console.log('3.inserted user=',userFromRequest)
+  //console.log('5. look for log with id',request.params.id)
   //const BlogToDelete = await Blog.find(request.params.id)
   const BlogToDelete = await Blog.findById(request.params.id)
-  console.log('6.blogtodelete',BlogToDelete)
+  /* console.log('6.blogtodelete',BlogToDelete)
   console.log('7.BlogToDelete.user.toString=',BlogToDelete.user.toString())
   console.log('8.userFromRequest.toString()',userFromRequest.toString())
   console.log('9.userid_d fo comparision=',userFromRequest._id)
-  console.log('9a.userid id fo comparision=',userFromRequest.id)
-  //const user2=BlogToDelete.user
+  console.log('9a.userid id fo comparision=',userFromRequest.id) */
   if ( BlogToDelete.user.toString() === userFromRequest.id.toString() ) {
     await Blog.findByIdAndRemove(request.params.id)
     const userBlogsID=userFromRequest.blogs
-    console.log('users list of blogs at start=',userBlogsID)
+    //console.log('users list of blogs at start=',userBlogsID)
 
     //console.log('blogs length=',leftBlogsID.length)
     const stringToExclude=request.params.id.toString()
-    console.log('string to remove from list=',stringToExclude)
+    //console.log('string to remove from list=',stringToExclude)
     const leftBlogsID=userBlogsID.filter(item => {
-      console.log('item.toString=',item.toString())
+      //console.log('item.toString=',item.toString())
       return (item.toString()!==stringToExclude)
     })
-    //      const arrEnd=arrStart.filter(item => {return(item!==stringToExclude)})
-    console.log('maped blogs are=',leftBlogsID)
-    console.log('blogs length=',leftBlogsID.length)
+    //console.log('maped blogs are=',leftBlogsID)
+    //console.log('blogs length=',leftBlogsID.length)
     if (leftBlogsID.length===0){
       userFromRequest.blogs =[]
     }
@@ -138,13 +136,6 @@ blogsRouter.delete('/:id',middleware.userExtractor, async (request, response) =>
 
 })
 
-/* blogsRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndRemove(request.params.id)
-    .then(() => {
-      response.status(204).end()
-    })
-    .catch(error => next(error))
-}) */
 
 blogsRouter.put('/:id', async (request, response) => {
   const body = request.body

@@ -234,29 +234,46 @@ test('catch status 400 if url is missing', async () => {
 
 })
 //4.12
-//part 4.13
+/* //part 4.13
 describe('deletion of a blog', () => {
-  test('blog delete succeeds with status code 204 if id is valid', async () => {
-    const blogsAtStart = await listHelper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
-    console.log(blogToDelete.id)
+  test('part_4_13 blog delete succeeds with status code 204 if id is valid', async () => {
+    const usersAtStart = await listHelper.usersInDb()
+    console.log('--------------1. usersAtStart',usersAtStart)
+    const userWantToDelBlog=await listHelper.wantedUser(usersAtStart)
+    console.log('2. usersAtStart',userWantToDelBlog)
     //4.23 add user
     const user ={
       username: 'old',
       password: 'divan'
     }
 
-    const resultUser=await api
+    const loggingUser=await api
       .post('/api/login')
       .send(user)
       .expect(200)
 
     let token ='bearer '
-    token=await token.concat(resultUser.body.token.toString())
-    console.log('token in post=',token)
+    token=await token.concat(loggingUser.body.token.toString())
+    //console.log('2.token in post=',token)
+
+    //console.log('2a.logginUser.body=',loggingUser.body)
+
+    //const fetchedUser=await api
+    //  .get(`/api/users/${loggingUser.id}`)
+
+    //console.log('3.fetched user=',fetchedUser.body)
+
+    const blogsAtStart1 =await userWantToDelBlog.blogs
+    console.log('4_13: 3.blogsAtStart=',blogsAtStart1)
+    console.log('4_13: 4.blogToDelete.id=',blogsAtStart1[0])
+    const blogToDeleteId = await blogsAtStart1[0].toString()
+    console.log('4_13: 5.blogToDeleteId=',blogToDeleteId)
+    const blogToDelete1 =  await Blog.findById(blogToDeleteId)
     //4.23
+
+
     await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
+      .delete(`/api/blogs/${blogToDeleteId}`)
       .set({ Authorization:token })
       .expect(204)
 
@@ -266,11 +283,11 @@ describe('deletion of a blog', () => {
     )
     const titles = blogsAtEnd.map(r => r.title)
 
-    expect(titles).not.toContain(blogToDelete.title)
+    expect(titles).not.toContain(blogToDelete1.title)
   })
 })
 //4.13
-//part 4.14
+ *///part 4.14
 describe('update a blog', () => {
   test('blog can be updated', async () => {
     const blogsAtStart = await listHelper.blogsInDb()
@@ -429,22 +446,10 @@ describe('when there is initially one user at db', () => {
 })
 describe('when there are initially two(three) user at db', () => {
   beforeEach(async () => {
-
-    //const cry = (s) => { return bcrypt.hash(s, 10) }
     const twoUsers = listHelper.twoUsers
-    //const twoUsers1 = twoUsers.map(function (u) {
-    //  return { username: u.username, name: u.name, cry(u.password)
-    // }
-    //})
-    //const passwordHash = await bcrypt.hash('sekret', 10)
-    //const user = new User({ username: 'root', passwordHash })
-
-    //const passwordHash = await bcrypt.hash('sekret', 10)
-    //const user = new User({ username: 'root', passwordHash })
     await User.deleteMany({})
     await User.insertMany(twoUsers)
 
-    //await User.insertMany(twoUsers)
     await Blog.deleteMany({})
     await Blog.insertMany(listHelper.initialBlogs)
   })
@@ -487,14 +492,10 @@ describe('when there are initially two(three) user at db', () => {
     // const contents = notesAtEnd.map(n => n.content)
     const titles = blogsAtEnd.map(r => r.title)
     //
-    // response = await api.get('/api/blogs')
-
-    //const titles = response.body.map(r => r.title)
-
-    //expect(response.body).toHaveLength(initialBlogs.length + 1)
+    console.log('titles=',titles)
 
     expect(titles).toContain(
-      'async/await simplifies making async calls'
+      'async/await simplifies making async calls in validblog2'
     )
   })
   //4.16
